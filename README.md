@@ -1,38 +1,55 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# LaunchDarkly Feature Flag Apple Store
 
-## Getting Started
+This template uses Edge Config as fast storage to control whether the store is open or closed.
 
-First, run the development server:
+## Demo
+
+https://edge-functions-feature-flag-apple-store.vercel.app/
+
+## How to Use
+
+#### Set up environment variables
+
+Copy the `.env.example` file in this directory to `.env.local` (which will be ignored by Git):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This example requires you to set up an Edge Config and store its connection string in the `EDGE_CONFIG` environment variable.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Fill the Edge Config you create with this content:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```json
+{ "featureFlagsAppleStore_storeClosed": true }
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Next, run Next.js in development mode:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm dev
+```
 
-## Learn More
+Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=edge-middleware-eap) ([Documentation](https://nextjs.org/docs/deployment)).
 
-To learn more about Next.js, take a look at the following resources:
+## Opening / Closing the Store using the Dashboard
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You can control whether the store is open or not by changing the value of `featureFlagsAppleStore_storeClosed` using the [Edge Config Dashboard](https://vercel.com/docs/concepts/edge-network/edge-config/edge-config-dashboard#manage-edge-configs).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Opening / Closing the Store using API Routes
 
-## Deploy on Vercel
+> Note that you need to provide your own `TEAM_ID_VERCEL` and `AUTH_BEARER_TOKEN` environment variables in `.env.local` if you want to open or close the store using the routes shown below.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To open the store go to:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```
+http://localhost:3000/api/store/open
+```
+
+To close the store go to:
+
+```
+http://localhost:3000/api/store/close
+```
+
+Alternatively you can use the Edge Config UI in your Vercel dashboard to update the `featureFlagsAppleStore_storeClosed` value directly.
