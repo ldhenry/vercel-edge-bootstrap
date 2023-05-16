@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { get } from "lib/feature-flags";
 import { createClient, parseConnectionString } from "@vercel/edge-config";
-import { init } from "@launchdarkly/vercel-server-sdk";
+import { LDContext, init } from "@launchdarkly/vercel-server-sdk";
 
 export const config = {
   matcher: "/",
@@ -25,15 +25,19 @@ export async function middleware(req: NextRequest) {
 
   try {
     await ldClient.waitForInitialization();
-    const flags = (
-      await ldClient.allFlagsState({
-        kind: "user",
-        key: "test-user",
-      })
-    ).toJSON();
-    console.log(flags);
+    const flagContext: LDContext = {
+      kind: "user",
+      key: "test-user",
+    };
+    const flags = (await ldClient.allFlagsState(flagContext)).toJSON();
 
-    if (await get("storeClosed")) {
+    const storeClosed = await ldClient.variation(
+      "store-closed",
+      flagContext,
+      false
+    );
+
+    if (storeClosed) {
       req.nextUrl.pathname = `/_closed`;
       return NextResponse.rewrite(req.nextUrl);
     }
