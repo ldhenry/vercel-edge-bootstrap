@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { get } from "lib/feature-flags";
 import { createClient, parseConnectionString } from "@vercel/edge-config";
 import { LDContext, init } from "@launchdarkly/vercel-server-sdk";
 
