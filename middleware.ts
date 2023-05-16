@@ -25,10 +25,12 @@ export async function middleware(req: NextRequest) {
 
   try {
     await ldClient.waitForInitialization();
-    const flags = await ldClient.allFlagsState({
-      kind: "user",
-      key: "test-user",
-    });
+    const flags = (
+      await ldClient.allFlagsState({
+        kind: "user",
+        key: "test-user",
+      })
+    ).toJSON();
     console.log(flags);
 
     if (await get("storeClosed")) {

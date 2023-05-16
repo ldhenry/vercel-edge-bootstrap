@@ -10,7 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@launchdarkly/vercel-server-sdk": "^0.2.2",
+    "@launchdarkly/vercel-server-sdk": "^0.3.0",
     "@vercel/edge-config": "0.1.10",
     "next": "canary",
     "react": "latest",
