@@ -1,7 +1,10 @@
-import type { FC } from 'react'
-import Image from 'next/image'
+import type { FC } from "react";
+import Image from "next/image";
+import launchdarklySingleton from "lib/launchdarkly";
+import { GetServerSidePropsContext } from "next";
+import { LDMultiKindContext } from "@launchdarkly/vercel-server-sdk";
 
-type ProductCardProps = { src: string; href: string; name: string }
+type ProductCardProps = { src: string; href: string; name: string };
 
 const ProductCard: FC<ProductCardProps> = ({ src, href, name }) => (
   <li className="min-w-[120px]">
@@ -12,9 +15,38 @@ const ProductCard: FC<ProductCardProps> = ({ src, href, name }) => (
       </p>
     </a>
   </li>
-)
+);
 
-export default function Home() {
+export const config = {
+  runtime: "experimental-edge",
+};
+
+type HomeProps = {
+  ldFlags: object;
+};
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { req } = context;
+  const flagContext: LDMultiKindContext = {
+    kind: "multi",
+    url: {
+      key: req.url || "unknown",
+    },
+    method: {
+      key: req.method || "unknown",
+    },
+    "user-agent": {
+      key: req.headers["user-agent"] || "unknown",
+    },
+  };
+  const ldClient = await launchdarklySingleton.getClient();
+  const flags = (await ldClient.allFlagsState(flagContext)).toJSON();
+  return {
+    props: { ldFlags: flags },
+  };
+}
+
+export default function Home({ ldFlags }: HomeProps) {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <section className="flex flex-col w-full mx-auto py-7 justify-center bg-white">
@@ -76,6 +108,10 @@ export default function Home() {
           />
         </ul>
       </section>
+      <section>
+        <h2 className="text-center">Bootstrapped feature flag data:</h2>
+        <pre>{JSON.stringify(ldFlags, undefined, 2)}</pre>
+      </section>
     </div>
-  )
+  );
 }
