@@ -159,7 +159,8 @@ export default function Page({
 
       <section>
         <h1>
-          Bootstrapping: {flags["bootstrap-flags"] ? "enabled" : "disabled"}
+          Edge bootstrapping:{" "}
+          {flags["bootstrap-flags"] ? "enabled" : "disabled"}
         </h1>
         <h1>LD Client init time: {initializationTime} ms</h1>
       </section>
