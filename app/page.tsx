@@ -35,24 +35,33 @@ const ProductCard: FC<ProductCardProps> = ({ src, href, name, onClick }) => (
   </li>
 );
 
+const cleanBootstrapPayload = (bootstrappedFlags: LDFlagSet) => {
+  const { $flagsState, $valid, ...allFlags } = bootstrappedFlags;
+  return allFlags;
+};
+
 export default function Page({
   params,
 }: {
-  params: { envId: string; context: LDContext; bootstrappedFlags: LDFlagSet };
+  params: { envId: string; context: LDContext; bootstrappedFlags?: LDFlagSet };
 }) {
   const { envId, context, bootstrappedFlags } = params;
-  const { $flagsState, $valid, ...allFlags } = bootstrappedFlags;
-  const [flags, setFlags] = useState<LDFlagSet>(allFlags);
+  const initialFlags = bootstrappedFlags
+    ? cleanBootstrapPayload(bootstrappedFlags)
+    : undefined;
+  const [flags, setFlags] = useState<LDFlagSet | undefined>(initialFlags);
+  const [initializationTime, setInitializationTime] = useState<number>();
   const [ldClient, setLdClient] = useState<LDClient>();
 
   useEffect(() => {
+    const initStart = new Date();
     const ldClient = initialize(envId, context, {
-      bootstrap: bootstrappedFlags["bootstrap-flags"]
-        ? bootstrappedFlags
-        : undefined,
+      bootstrap: bootstrappedFlags,
       streaming: false,
     });
     ldClient.waitForInitialization().then(() => {
+      const initDuration = new Date().valueOf() - initStart.valueOf();
+      setInitializationTime(initDuration);
       ldClient.variation("enable-hot-dog-favicon");
 
       setFlags(ldClient.allFlags());
@@ -72,6 +81,10 @@ export default function Page({
       ldClient.track("Product Card clicked");
     }
   };
+
+  if (!flags) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
@@ -144,10 +157,17 @@ export default function Page({
         </ul>
       </section>
 
+      <section>
+        <h1>
+          Bootstrapping: {flags["bootstrap-flags"] ? "enabled" : "disabled"}
+        </h1>
+        <h1>LD Client init time: {initializationTime} ms</h1>
+      </section>
+
       {flags["show-debugging-info"] && (
         <>
           <section>
-            <h2 className="text-center">Bootstrapped feature flag data:</h2>
+            <h2 className="text-center">feature flag data:</h2>
             <pre>{JSON.stringify(flags, undefined, 2)}</pre>
           </section>
 

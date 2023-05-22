@@ -22,8 +22,15 @@ export default async function RootLayout(props: {
     },
   };
 
-  const bootstrappedFlags = (await ldClient.allFlagsState(context)).toJSON();
-  props.params.bootstrappedFlags = bootstrappedFlags;
+  const bootstrappedFlags = (
+    await ldClient.allFlagsState(context)
+  ).toJSON() as {
+    "bootstrap-flags": boolean;
+  };
+  if (bootstrappedFlags["bootstrap-flags"]) {
+    props.params.bootstrappedFlags = bootstrappedFlags;
+  }
+
   props.params.envId = process.env.LD_CLIENT_SIDE_ID;
   props.params.context = context;
   return (
