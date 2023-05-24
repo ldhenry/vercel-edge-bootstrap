@@ -43,10 +43,10 @@ export default function MissingEdgeConfigDialog() {
                   <ol className="text-sm text-gray-500 list-disc ml-8 mt-2 flex gap-2 flex-col">
                     <li className="list-item list-disc">
                       Create an Edge Config and connect it to this project and
-                      store its connection string under the{' '}
+                      store its connection string under the{" "}
                       <span className="bg-gray-100 p-1 text-gray-900 rounded">
                         EDGE_CONFIG
-                      </span>{' '}
+                      </span>{" "}
                       environment variable
                     </li>
                     <li className="list-item list-disc">
@@ -78,5 +78,5 @@ export default function MissingEdgeConfigDialog() {
         </div>
       </div>
     </div>
-  )
+  );
 }

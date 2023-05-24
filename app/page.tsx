@@ -1,13 +1,9 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import Image from "next/image";
-import {
-  LDClient,
-  LDContext,
-  LDFlagSet,
-  initialize,
-} from "launchdarkly-js-client-sdk";
+import { LDFlagSet } from "launchdarkly-js-client-sdk";
+import { useFlags, useLDClient } from "launchdarkly-react-client-sdk";
 
 type ProductCardProps = {
   src: string;
@@ -40,51 +36,13 @@ const cleanBootstrapPayload = (bootstrappedFlags: LDFlagSet) => {
   return allFlags;
 };
 
-export default function Page({
-  params,
-}: {
-  params: { envId: string; context: LDContext; bootstrappedFlags?: LDFlagSet };
-}) {
-  const { envId, context, bootstrappedFlags } = params;
-  const initialFlags = bootstrappedFlags
-    ? cleanBootstrapPayload(bootstrappedFlags)
-    : undefined;
-  const [flags, setFlags] = useState<LDFlagSet | undefined>(initialFlags);
-  const [initializationTime, setInitializationTime] = useState<number>();
-  const [ldClient, setLdClient] = useState<LDClient>();
-
-  useEffect(() => {
-    const initStart = new Date();
-    const ldClient = initialize(envId, context, {
-      bootstrap: bootstrappedFlags,
-      streaming: false,
-    });
-    ldClient.waitForInitialization().then(() => {
-      const initDuration = new Date().valueOf() - initStart.valueOf();
-      setInitializationTime(initDuration);
-      ldClient.variation("enable-hot-dog-favicon");
-
-      setFlags(ldClient.allFlags());
-      setLdClient(ldClient);
-      ldClient.on("change", () => {
-        setFlags(ldClient.allFlags());
-      });
-    });
-    return () => {
-      ldClient.flush();
-    };
-  }, [envId, context, bootstrappedFlags]);
+export default function Page() {
+  const ldClient = useLDClient();
+  const flags = useFlags();
 
   const handleClick = () => {
-    if (ldClient) {
-      console.log("Product Card Clicked");
-      ldClient.track("Product Card clicked");
-    }
+    ldClient?.track("Product Card clicked");
   };
-
-  if (!flags) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
@@ -157,24 +115,13 @@ export default function Page({
         </ul>
       </section>
 
-      <section>
-        <h1>
-          Edge bootstrapping:{" "}
-          {flags["bootstrap-flags"] ? "enabled" : "disabled"}
-        </h1>
-        <h1>LD Client init time: {initializationTime} ms</h1>
-      </section>
-
       {flags["show-debugging-info"] && (
         <>
           <section>
             <h2 className="text-center">feature flag data:</h2>
-            <pre>{JSON.stringify(flags, undefined, 2)}</pre>
-          </section>
-
-          <section>
-            <h2 className="text-center">LaunchDarkly context:</h2>
-            <pre>{JSON.stringify(context, undefined, 2)}</pre>
+            <pre>
+              {JSON.stringify(cleanBootstrapPayload(flags), undefined, 2)}
+            </pre>
           </section>
         </>
       )}

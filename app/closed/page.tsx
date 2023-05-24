@@ -19,5 +19,5 @@ export default function Closed() {
         We&apos;re busy updating the Apple Store for you and will be back soon.
       </p>
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { parseConnectionString } from "@vercel/edge-config";
 import { LDMultiKindContext } from "@launchdarkly/vercel-server-sdk";
-import launchdarklySingleton from "lib/launchdarkly";
+import { ldEdgeClient } from "lib/ldEdgeClient";
 
 export const config = {
-  matcher: ["/", "/favicon.ico"],
+  matcher: ["/", "/closed", "/favicon.ico"],
 };
 
 export async function middleware(req: NextRequest, context: NextFetchEvent) {
@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest, context: NextFetchEvent) {
   }
 
   try {
-    const client = await launchdarklySingleton.getClient();
+    const client = await ldEdgeClient.waitForInitialization();
     const flagContext: LDMultiKindContext = {
       kind: "multi",
       url: {
@@ -32,7 +32,9 @@ export async function middleware(req: NextRequest, context: NextFetchEvent) {
       },
     };
 
-    if (req.nextUrl.pathname === "/favicon.ico") {
+    const { pathname } = req.nextUrl;
+
+    if (pathname === "/favicon.ico") {
       const hotDogFaviconEnabled = await client.variation(
         "enable-hot-dog-favicon",
         flagContext,
@@ -51,9 +53,14 @@ export async function middleware(req: NextRequest, context: NextFetchEvent) {
       false
     );
 
-    if (storeClosed) {
-      req.nextUrl.pathname = `/_closed`;
-      return NextResponse.rewrite(req.nextUrl);
+    if (pathname === "/" && storeClosed) {
+      req.nextUrl.pathname = `/closed`;
+      return NextResponse.rewrite(new URL("/closed", req.url));
+    }
+
+    if (pathname === "/closed") {
+      req.nextUrl.pathname === "/";
+      return NextResponse.redirect(new URL("/", req.url));
     }
 
     return;
