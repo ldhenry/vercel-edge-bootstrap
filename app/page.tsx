@@ -41,6 +41,7 @@ export default function Page() {
   const flags = useFlags();
 
   const handleClick = () => {
+    // You can still use the LD React client to track events as usual.
     ldClient?.track("Product Card clicked");
   };
 
