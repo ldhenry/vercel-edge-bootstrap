@@ -8,9 +8,10 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest, context: NextFetchEvent) {
-  // for demo purposes, warn when there is no EDGE_CONFIG
+  // for demo purposes, warn when there is no EDGE_CONFIG or LAUNCHDARKLY_CLIENT_SIDE_ID
   if (
     !process.env.EDGE_CONFIG ||
+    !process.env.LD_CLIENT_SIDE_ID ||
     !parseConnectionString(process.env.EDGE_CONFIG)
   ) {
     req.nextUrl.pathname = "/missing-edge-config";

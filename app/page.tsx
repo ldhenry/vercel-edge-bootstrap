@@ -62,9 +62,7 @@ export default function Page() {
         <ul className="inline-flex gap-8 overflow-x-scroll">
           <ProductCard
             src={
-              flags["show-cat"]
-                ? "/cat.png"
-                : "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-mac-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783380000"
+              "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-mac-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783380000"
             }
             name="Mac"
             href="https://apple.com/shop/buy-mac"
