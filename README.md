@@ -4,7 +4,7 @@ This template uses Edge Config as fast storage to control whether the store is o
 
 ## Demo
 
-https://edge-functions-feature-flag-apple-store.vercel.app/
+https://hello-vercel-edge.vercel.app/
 
 ## How to Use
 
@@ -18,11 +18,7 @@ cp .env.example .env.local
 
 This example requires you to set up an Edge Config and store its connection string in the `EDGE_CONFIG` environment variable.
 
-Fill the Edge Config you create with this content:
-
-```json
-{ "featureFlagsAppleStore_storeClosed": true }
-```
+Additionally, you will need to have the LaunchDarkly Vercel integration configured to push feature flag data to your Vercel Edge Config. Read [Vercel](https://docs.launchdarkly.com/integrations/vercel/) to set up the integration.
 
 Next, run Next.js in development mode:
 
