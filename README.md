@@ -37,7 +37,7 @@ Set `LD_CLIENT_SIDE_ID` to the LaunchDarkly client-side ID from the same environ
 
 This example requires you to set up an Edge Config and store its connection string in the `EDGE_CONFIG` environment variable. You can specify the Edge Config connection string in `.env.local`, but it's probably easier to run the following command after linking the Edge Config to a project in vercel:
 
-```
+```bash
 vercel env pull .env.development.local
 ```
 

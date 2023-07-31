@@ -1,7 +1,8 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { parseConnectionString } from "@vercel/edge-config";
-import { LDMultiKindContext } from "@launchdarkly/vercel-server-sdk";
+import { LDClient, LDMultiKindContext } from "@launchdarkly/vercel-server-sdk";
 import { ldEdgeClient } from "lib/ldEdgeClient";
+import { NextURL } from "next/dist/server/web/next-url";
 
 export const config = {
   matcher: ["/", "/closed", "/favicon.ico"],
@@ -31,7 +32,17 @@ export async function middleware(req: NextRequest, context: NextFetchEvent) {
       "user-agent": {
         key: req.headers.get("user-agent") || "unknown",
       },
+      country: {
+        key: req.headers.get("x-vercel-ip-country") || "unknown",
+      },
+      city: {
+        key: req.headers.get("x-vercel-ip-city") || "unknown",
+      },
+      ip: {
+        key: req.headers.get("x-real-ip") || "unknown",
+      },
     };
+    context.waitUntil(client.flush());
 
     const { pathname } = req.nextUrl;
 
@@ -53,6 +64,8 @@ export async function middleware(req: NextRequest, context: NextFetchEvent) {
       flagContext,
       false
     );
+
+    client.track("middleware-event", flagContext);
 
     if (pathname === "/" && storeClosed) {
       req.nextUrl.pathname = `/closed`;

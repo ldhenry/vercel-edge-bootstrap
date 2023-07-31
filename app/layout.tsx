@@ -26,6 +26,15 @@ export default async function RootLayout({
     method: {
       key: "GET",
     },
+    country: {
+      key: headersList.get("x-vercel-ip-country") || "unknown",
+    },
+    city: {
+      key: headersList.get("x-vercel-ip-city") || "unknown",
+    },
+    ip: {
+      key: headersList.get("x-real-ip") || "unknown",
+    },
   };
 
   // The allFlagsState call is used to evaluate all feature flags for a given context so they can be bootstrapped but the
