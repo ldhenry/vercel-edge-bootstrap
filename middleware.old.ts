@@ -18,8 +18,6 @@ export async function middleware(req: NextRequest, context: NextFetchEvent) {
     return NextResponse.rewrite(req.nextUrl);
   }
 
-  return;
-
   try {
     const client = await ldEdgeClient.waitForInitialization();
     const flagContext: LDMultiKindContext = {
