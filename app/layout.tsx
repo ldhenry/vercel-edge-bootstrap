@@ -43,7 +43,6 @@ export default async function RootLayout({
     "bootstrap-flags": boolean;
   };
   ldEdgeClient.track("middleware-event", context);
-  ldEdgeClient.flush();
   const bootstrappedFlags = allFlags["bootstrap-flags"] ? allFlags : undefined;
 
   return (
